@@ -1,11 +1,23 @@
-(function(window, angular, undefined) {
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['angular'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require('angular'));
+  } else {
+    // Browser globals (root is window)
+    root.returnExports = factory(root.angular);
+  }
+}(this, function(angular) {
   'use strict';
-
   angular.module('ngToast.provider', [])
     .provider('ngToast', [
       function() {
         var messages = [],
-            messageStack = [];
+          messageStack = [];
 
         var defaults = {
           animation: false,
@@ -26,9 +38,9 @@
         };
 
         function Message(msg) {
-          var id = Math.floor(Math.random()*1000);
+          var id = Math.floor(Math.random() * 1000);
           while (messages.indexOf(id) > -1) {
-            id = Math.floor(Math.random()*1000);
+            id = Math.floor(Math.random() * 1000);
           }
 
           this.id = id;
@@ -53,7 +65,7 @@
 
         this.$get = [function() {
           var _createWithClassName = function(className, msg) {
-            msg = (typeof msg === 'object') ? msg : {content: msg};
+            msg = (typeof msg === 'object') ? msg : { content: msg };
             msg.className = className;
 
             return this.create(msg);
@@ -73,14 +85,14 @@
                 }
 
               } else {
-                while(messages.length > 0) {
+                while (messages.length > 0) {
                   messages.pop();
                 }
                 messageStack = [];
               }
             },
             create: function(msg) {
-              msg = (typeof msg === 'object') ? msg : {content: msg};
+              msg = (typeof msg === 'object') ? msg : { content: msg };
 
               if (defaults.combineDuplications) {
                 for (var i = messageStack.length - 1; i >= 0; i--) {
@@ -88,7 +100,7 @@
                   var _className = msg.className || 'success';
 
                   if (_msg.content === msg.content &&
-                      _msg.className === _className) {
+                    _msg.className === _className) {
                     messages[i].count++;
                     return;
                   }
@@ -96,7 +108,7 @@
               }
 
               if (defaults.maxNumber > 0 &&
-                  messageStack.length >= defaults.maxNumber) {
+                messageStack.length >= defaults.maxNumber) {
                 this.dismiss(messageStack[0]);
               }
 
@@ -123,4 +135,4 @@
       }
     ]);
 
-})(window, window.angular);
+}));

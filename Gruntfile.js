@@ -24,10 +24,10 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     banner: '/*!\n' +
-            ' * ngToast v<%= pkg.version %> (<%= pkg.homepage %>)\n' +
-            ' * Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author %>\n' +
-            ' * Licensed under <%= pkg.license %> (http://tameraydin.mit-license.org/)\n' +
-            ' */\n',
+      ' * ngToast v<%= pkg.version %> (<%= pkg.homepage %>)\n' +
+      ' * Copyright <%= grunt.template.today("yyyy") %> <%= pkg.author %>\n' +
+      ' * Licensed under <%= pkg.license %> (http://tameraydin.mit-license.org/)\n' +
+      ' */\n',
     karma: {
       unit: {
         configFile: paths.test + 'karma.conf.js',
@@ -60,8 +60,7 @@ module.exports = function(grunt) {
     },
     sass: {
       dist: {
-        files: [
-          {
+        files: [{
             src: paths.sass + 'ngToast.scss',
             dest: paths.dist + 'ngToast.css'
           },
@@ -72,8 +71,7 @@ module.exports = function(grunt) {
         ]
       },
       test: {
-        files: [
-          {
+        files: [{
             src: paths.sass + 'ngToast.scss',
             dest: paths.testSASS + 'ngToast.css'
           },
@@ -86,15 +84,13 @@ module.exports = function(grunt) {
     },
     less: {
       test: {
-        files: [
-          {
-            expand: true,
-            cwd: paths.less,
-            src: ['ngToast.less', 'ngToast-animations.less'],
-            dest: paths.testLESS,
-            ext: '.css'
-          }
-        ]
+        files: [{
+          expand: true,
+          cwd: paths.less,
+          src: ['ngToast.less', 'ngToast-animations.less'],
+          dest: paths.testLESS,
+          ext: '.css'
+        }]
       }
     },
     cssbeautifier: {
@@ -212,7 +208,6 @@ module.exports = function(grunt) {
     'less:test',
     'cssbeautifier',
     'test-generated-css',
-    'jshint',
     'karma',
     'clean:dist',
     'concat',

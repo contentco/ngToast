@@ -1,17 +1,29 @@
 /*!
  * ngToast v2.0.0 (http://tameraydin.github.io/ngToast)
- * Copyright 2016 Tamer Aydin (http://tamerayd.in)
+ * Copyright 2019 Tamer Aydin (http://tamerayd.in)
  * Licensed under MIT (http://tameraydin.mit-license.org/)
  */
 
-(function(window, angular, undefined) {
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['angular'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require('angular'));
+  } else {
+    // Browser globals (root is window)
+    root.returnExports = factory(root.angular);
+  }
+}(this, function(angular) {
   'use strict';
-
   angular.module('ngToast.provider', [])
     .provider('ngToast', [
       function() {
         var messages = [],
-            messageStack = [];
+          messageStack = [];
 
         var defaults = {
           animation: false,
@@ -32,9 +44,9 @@
         };
 
         function Message(msg) {
-          var id = Math.floor(Math.random()*1000);
+          var id = Math.floor(Math.random() * 1000);
           while (messages.indexOf(id) > -1) {
-            id = Math.floor(Math.random()*1000);
+            id = Math.floor(Math.random() * 1000);
           }
 
           this.id = id;
@@ -59,7 +71,7 @@
 
         this.$get = [function() {
           var _createWithClassName = function(className, msg) {
-            msg = (typeof msg === 'object') ? msg : {content: msg};
+            msg = (typeof msg === 'object') ? msg : { content: msg };
             msg.className = className;
 
             return this.create(msg);
@@ -79,14 +91,14 @@
                 }
 
               } else {
-                while(messages.length > 0) {
+                while (messages.length > 0) {
                   messages.pop();
                 }
                 messageStack = [];
               }
             },
             create: function(msg) {
-              msg = (typeof msg === 'object') ? msg : {content: msg};
+              msg = (typeof msg === 'object') ? msg : { content: msg };
 
               if (defaults.combineDuplications) {
                 for (var i = messageStack.length - 1; i >= 0; i--) {
@@ -94,7 +106,7 @@
                   var _className = msg.className || 'success';
 
                   if (_msg.content === msg.content &&
-                      _msg.className === _className) {
+                    _msg.className === _className) {
                     messages[i].count++;
                     return;
                   }
@@ -102,7 +114,7 @@
               }
 
               if (defaults.maxNumber > 0 &&
-                  messageStack.length >= defaults.maxNumber) {
+                messageStack.length >= defaults.maxNumber) {
                 this.dismiss(messageStack[0]);
               }
 
@@ -129,39 +141,51 @@
       }
     ]);
 
-})(window, window.angular);
+}));
 
-(function(window, angular) {
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['angular'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require('angular'));
+  } else {
+    // Browser globals (root is window)
+    root.returnExports = factory(root.angular);
+  }
+}(this, function(angular) {
   'use strict';
-
   angular.module('ngToast.directives', ['ngToast.provider'])
     .run(['$templateCache',
       function($templateCache) {
         $templateCache.put('ngToast/toast.html',
           '<div class="ng-toast ng-toast--{{hPos}} ng-toast--{{vPos}} {{animation ? \'ng-toast--animate-\' + animation : \'\'}}">' +
-            '<ul class="ng-toast__list">' +
-              '<toast-message ng-repeat="message in messages" ' +
-                'message="message" count="message.count">' +
-                '<span ng-bind-html="message.content"></span>' +
-              '</toast-message>' +
-            '</ul>' +
+          '<ul class="ng-toast__list">' +
+          '<toast-message ng-repeat="message in messages" ' +
+          'message="message" count="message.count">' +
+          '<span ng-bind-html="message.content"></span>' +
+          '</toast-message>' +
+          '</ul>' +
           '</div>');
         $templateCache.put('ngToast/toastMessage.html',
           '<li class="ng-toast__message {{message.additionalClasses}}"' +
-            'ng-mouseenter="onMouseEnter()"' +
-            'ng-mouseleave="onMouseLeave()">' +
-            '<div class="alert alert-{{message.className}}" ' +
-              'ng-class="{\'alert-dismissible\': message.dismissButton}">' +
-              '<button type="button" class="close" ' +
-                'ng-if="message.dismissButton" ' +
-                'ng-bind-html="message.dismissButtonHtml" ' +
-                'ng-click="!message.dismissOnClick && dismiss()">' +
-              '</button>' +
-              '<span ng-if="count" class="ng-toast__message__count">' +
-                '{{count + 1}}' +
-              '</span>' +
-              '<span ng-if="!message.compileContent" ng-transclude></span>' +
-            '</div>' +
+          'ng-mouseenter="onMouseEnter()"' +
+          'ng-mouseleave="onMouseLeave()">' +
+          '<div class="alert alert-{{message.className}}" ' +
+          'ng-class="{\'alert-dismissible\': message.dismissButton}">' +
+          '<button type="button" class="close" ' +
+          'ng-if="message.dismissButton" ' +
+          'ng-bind-html="message.dismissButtonHtml" ' +
+          'ng-click="!message.dismissOnClick && dismiss()">' +
+          '</button>' +
+          '<span ng-if="count" class="ng-toast__message__count">' +
+          '{{count + 1}}' +
+          '</span>' +
+          '<span ng-if="!message.compileContent" ng-transclude></span>' +
+          '</div>' +
           '</li>');
       }
     ])
@@ -245,9 +269,10 @@
               $timeout(function() {
                 $compile(transcludedEl.contents())
                   (typeof scopeToBind === 'boolean' ?
-                    scope.$parent : scopeToBind, function(compiledClone) {
-                    transcludedEl.replaceWith(compiledClone);
-                  });
+                    scope.$parent : scopeToBind,
+                    function(compiledClone) {
+                      transcludedEl.replaceWith(compiledClone);
+                    });
               }, 0);
             }
 
@@ -269,16 +294,27 @@
       }
     ]);
 
-})(window, window.angular);
+}));
 
-(function(window, angular) {
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['angular'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require('angular'));
+  } else {
+    // Browser globals (root is window)
+    root.returnExports = factory(root.angular);
+  }
+}(this, function(angular) {
   'use strict';
-
-  angular
+  return angular
     .module('ngToast', [
       'ngSanitize',
       'ngToast.directives',
       'ngToast.provider'
     ]);
-
-})(window, window.angular);
+}));

@@ -1,34 +1,46 @@
-(function(window, angular) {
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define(['angular'], factory);
+  } else if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require('angular'));
+  } else {
+    // Browser globals (root is window)
+    root.returnExports = factory(root.angular);
+  }
+}(this, function(angular) {
   'use strict';
-
   angular.module('ngToast.directives', ['ngToast.provider'])
     .run(['$templateCache',
       function($templateCache) {
         $templateCache.put('ngToast/toast.html',
           '<div class="ng-toast ng-toast--{{hPos}} ng-toast--{{vPos}} {{animation ? \'ng-toast--animate-\' + animation : \'\'}}">' +
-            '<ul class="ng-toast__list">' +
-              '<toast-message ng-repeat="message in messages" ' +
-                'message="message" count="message.count">' +
-                '<span ng-bind-html="message.content"></span>' +
-              '</toast-message>' +
-            '</ul>' +
+          '<ul class="ng-toast__list">' +
+          '<toast-message ng-repeat="message in messages" ' +
+          'message="message" count="message.count">' +
+          '<span ng-bind-html="message.content"></span>' +
+          '</toast-message>' +
+          '</ul>' +
           '</div>');
         $templateCache.put('ngToast/toastMessage.html',
           '<li class="ng-toast__message {{message.additionalClasses}}"' +
-            'ng-mouseenter="onMouseEnter()"' +
-            'ng-mouseleave="onMouseLeave()">' +
-            '<div class="alert alert-{{message.className}}" ' +
-              'ng-class="{\'alert-dismissible\': message.dismissButton}">' +
-              '<button type="button" class="close" ' +
-                'ng-if="message.dismissButton" ' +
-                'ng-bind-html="message.dismissButtonHtml" ' +
-                'ng-click="!message.dismissOnClick && dismiss()">' +
-              '</button>' +
-              '<span ng-if="count" class="ng-toast__message__count">' +
-                '{{count + 1}}' +
-              '</span>' +
-              '<span ng-if="!message.compileContent" ng-transclude></span>' +
-            '</div>' +
+          'ng-mouseenter="onMouseEnter()"' +
+          'ng-mouseleave="onMouseLeave()">' +
+          '<div class="alert alert-{{message.className}}" ' +
+          'ng-class="{\'alert-dismissible\': message.dismissButton}">' +
+          '<button type="button" class="close" ' +
+          'ng-if="message.dismissButton" ' +
+          'ng-bind-html="message.dismissButtonHtml" ' +
+          'ng-click="!message.dismissOnClick && dismiss()">' +
+          '</button>' +
+          '<span ng-if="count" class="ng-toast__message__count">' +
+          '{{count + 1}}' +
+          '</span>' +
+          '<span ng-if="!message.compileContent" ng-transclude></span>' +
+          '</div>' +
           '</li>');
       }
     ])
@@ -112,9 +124,10 @@
               $timeout(function() {
                 $compile(transcludedEl.contents())
                   (typeof scopeToBind === 'boolean' ?
-                    scope.$parent : scopeToBind, function(compiledClone) {
-                    transcludedEl.replaceWith(compiledClone);
-                  });
+                    scope.$parent : scopeToBind,
+                    function(compiledClone) {
+                      transcludedEl.replaceWith(compiledClone);
+                    });
               }, 0);
             }
 
@@ -136,4 +149,4 @@
       }
     ]);
 
-})(window, window.angular);
+}));
